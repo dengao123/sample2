@@ -1,5 +1,5 @@
 <?php
-
+/*授权重定向*/
 namespace App\Http\Middleware;
 
 use Closure;
@@ -18,7 +18,9 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if (Auth::guard($guard)->check()) {
-            return redirect('/home');
+            $msg =  $request->is('signup')?'您已登录并已注册！':'您已登录，无需再次操作';
+            session()->flash('info',$msg);
+            return redirect('/');
         }
 
         return $next($request);
