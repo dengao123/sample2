@@ -26,7 +26,7 @@ class UsersController extends Controller
     public function index()
     {
 
-        $users = User::paginate(10)->orderBy('id', 'desc');
+        $users = User::orderBy('id', 'desc')->paginate(10);
         return view('users.index',compact('users'));
     }
 
@@ -116,13 +116,11 @@ class UsersController extends Controller
     {
         $view = 'emails.confirm';
         $data = compact('user');
-        $from = 'aufree@yousails.com';
-        $name = 'Aufree';
         $to = $user->email;
-        $subject = "感谢注册 Sample 应用！请确认你的邮箱。";
+        $subject = "感谢注册 Sample2 应用！请确认你的邮箱。";
 
-        Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject) {
-            $message->from($from, $name)->to($to)->subject($subject);
+        Mail::send($view, $data, function ($message) use ($to, $subject) {
+            $message->to($to)->subject($subject);
         });
     }
 
