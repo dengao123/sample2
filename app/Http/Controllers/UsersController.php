@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Dotenv\Validator;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Auth;
+use Mail;
 
 class UsersController extends Controller
 {
@@ -12,7 +14,7 @@ class UsersController extends Controller
     public function __construct()
     {
         $this->middleware('auth',[
-            'except'=>['show','create','store','index']
+            'except'=>['show','create','store','index','confirmEmail']
         ]);
 
         $this->middleware('guest', [
@@ -24,7 +26,7 @@ class UsersController extends Controller
     public function index()
     {
 
-        $users = User::paginate(10);
+        $users = User::paginate(10)->orderBy('id', 'desc');
         return view('users.index',compact('users'));
     }
 
@@ -42,7 +44,7 @@ class UsersController extends Controller
     }
 
 
-    //提交页面
+    //创建提交页面
     public function store(Request $request)
     {
 
@@ -58,9 +60,11 @@ class UsersController extends Controller
             'email'=>$request->email,
             'password'=>bcrypt($request->password)
         ]);
-
-        session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
-        return redirect()->route('users.show',[$user]);
+       /* Auth::login($user);*/
+       //发送注册确认邮件
+        $this->senEmailConfirmation($user);
+        session()->flash('success', '验证邮件已发送到你的注册邮箱上，请注意查收。');
+        return redirect('/');
     }
 
 
@@ -105,5 +109,32 @@ class UsersController extends Controller
        $user->delete();
        session()->flash('success','用户删除成功');
        return back();
+    }
+
+
+    public function  senEmailConfirmation($user)
+    {
+        $view = 'emails.confirm';
+        $data = compact('user');
+        $from = 'aufree@yousails.com';
+        $name = 'Aufree';
+        $to = $user->email;
+        $subject = "感谢注册 Sample 应用！请确认你的邮箱。";
+
+        Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject) {
+            $message->from($from, $name)->to($to)->subject($subject);
+        });
+    }
+
+
+    public function confirmEmail($token)
+    {
+        $user = User::where('activation_token',$token)->firstOrFail();
+        $user->activated = true;
+        $user->activation_token = null;
+        $user->save();
+        Auth::login($user);
+        session()->flash('success','恭喜你，激活成功');
+        return redirect()->route('users.show',compact('user'));
     }
 }
