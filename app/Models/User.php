@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\ResetPassword;
+use App\Models\Status;
 
 class User extends Authenticatable
 {
@@ -29,12 +30,6 @@ class User extends Authenticatable
     ];
 
 
-    public function gravatar($size = '100')
-    {
-        $hash = md5(strtolower(trim($this->attributes['email'])));
-        return "http://www.gravatar.com/avatar/$hash?s=$size";
-    }
-
     public static function boot()
     {
         //在用户模型类完成初始化之后进行加载
@@ -45,8 +40,22 @@ class User extends Authenticatable
     }
 
 
+    public function gravatar($size = '100')
+    {
+        $hash = md5(strtolower(trim($this->attributes['email'])));
+        return "http://www.gravatar.com/avatar/$hash?s=$size";
+    }
+
+
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPassword($token));
     }
+
+    public function statuses()
+    {
+        return $this->hasMany(Status::class);
+    }
+
+
 }
