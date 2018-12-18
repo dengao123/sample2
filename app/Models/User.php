@@ -52,6 +52,7 @@ class User extends Authenticatable
         $this->notify(new ResetPassword($token));
     }
 
+    //一对多，寻找该用户的所有动态
     public function statuses()
     {
         return $this->hasMany(Status::class);
