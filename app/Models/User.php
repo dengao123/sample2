@@ -59,4 +59,12 @@ class User extends Authenticatable
     }
 
 
+    //获取用户发布的动态
+    public function feed()
+    {
+        return $this->statuses()
+                    ->orderBy('created_at','desc');
+    }
+
+
 }

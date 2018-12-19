@@ -48,3 +48,4 @@ Route::post('password/reset', 'Auth\ResetPasswordController@reset')->name('passw
 /*Auth::routes();
 
 /*Route::get('/home', 'HomeController@index')->name('home');*/
+Route::resource('statuses','StatusesController',['only'=>['store','destroy']]);
