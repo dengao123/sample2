@@ -8,21 +8,24 @@
                     <section class="user_info">
                         @include('shared._user_info', ['user' => $user])
                     </section>
-                    <section class="statuses">
-                        @if(count($statuses)>0)
-                            <ul class="list-unstyled">
-                                @foreach($statuses as $status)
-                                   @include('statuses._status')
-                                @endforeach
-                            </ul>
-                            <div class="mt-5">
-                                {!! $statuses->render() !!}
-                            </div>
-                        @else
-                            <p>没有数据！</p>
-                        @endif
+                    <section class="stats">
+                        @include('shared._stats', ['user' => $user])
                     </section>
                 </div>
+            </div>
+            <div class="col-md-12">
+                @if (Auth::check())
+                    @include('users._follow_form')
+                @endif
+
+                @if (count($statuses) > 0)
+                    <ol class="statuses">
+                        @foreach ($statuses as $status)
+                            @include('statuses._status')
+                        @endforeach
+                    </ol>
+                    {!! $statuses->render() !!}
+                @endif
             </div>
         </div>
     </div>
